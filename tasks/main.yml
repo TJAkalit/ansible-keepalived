@@ -1,0 +1,27 @@
+---
+# tasks file for keepalived
+- name: Install keepalived package
+  tags:
+    - debian
+  ansible.builtin.apt:
+    name: keepalived
+    state: present
+  when: ansible_distribution == "Debian"
+
+- name: Make config
+  tags:
+    - debian
+  ansible.builtin.template:
+    src: debian-config.conf
+    dest: /etc/keepalived/keepalived.conf
+    backup: true
+  notify:
+    - systemd | Restart keepalived
+
+- name: systemd | Restart keepalived
+  tags:
+    - never
+    - restart
+  ansible.builtin.systemd:
+    name: keepalived
+    state: restarted
